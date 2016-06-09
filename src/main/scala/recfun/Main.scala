@@ -47,24 +47,19 @@ object Main {
    * Exercise 3
    */
     def countChange(money: Int, coins: List[Int]): Int = {
-      def loop(money: Int, coins: List[Int], curCoins: List[Int], acc : Int): Int = {
-         if (coins.isEmpty && curCoins.isEmpty) {
-           acc
-         } else {
-           val nextAcc = if (sum(curCoins, curCoins, 0) == money) acc + 1 else acc
-           val nextCurCoins = if (coins.isEmpty) curCoins.tail else curCoins ::: List(coins.head)
-           val nextCoins = if (!coins.isEmpty) curCoins.tail else List()
-           loop(money, nextCoins, nextCurCoins, nextAcc)
+       def checkCoin(coins: List[Int], coin: Int, acc: Int, counter: Int): Int = {
+         var c = 0
+         if (acc < money) {
+           c = checkCoin(coins, coin, acc + coin, counter)
+         } else if (acc == money) {
+           c = counter + 1
+         } else if (acc > money) {
+           c = counter
          }
-      }
-      def sum(coins: List[Int], curCoins: List[Int], acc : Int): Int = {
-        if (acc >= money)
-          acc
-        else if (curCoins.isEmpty)
-          sum(coins, coins, acc)
-        else
-          sum(coins, curCoins.tail, acc + curCoins.head)
-      }
-      loop(money, coins.tail, List(coins.head), 0)
+         if (!coins.isEmpty)
+           c = checkCoin(coins.tail, coins.head, acc, c)
+         c
+       }
+       checkCoin(coins.tail, coins.head, 0, 0)
     }
   }
