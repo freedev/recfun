@@ -47,19 +47,40 @@ object Main {
    * Exercise 3
    */
     def countChange(money: Int, coins: List[Int]): Int = {
-       def checkCoin(coins: List[Int], coin: Int, acc: Int, counter: Int): Int = {
-         var c = 0
-         if (acc < money) {
-           c = checkCoin(coins, coin, acc + coin, counter)
-         } else if (acc == money) {
-           c = counter + 1
-         } else if (acc > money) {
-           c = counter
-         }
-         if (!coins.isEmpty)
-           c = checkCoin(coins.tail, coins.head, acc, c)
-         c
-       }
-       checkCoin(coins.tail, coins.head, 0, 0)
+        
+      def countCoins(s: List[Int], rest: Int, counter: Int): Int = {
+        var c = counter
+        if (!s.isEmpty) {
+          var curRest = rest - s.head
+          if (!(curRest < 0)) {
+            if (curRest >= s.head) {
+              if (s.size > 1) {
+                c = countCoins(s.tail, curRest, c)
+              }
+              c = countCoins(s, curRest, c)
+            } else if (curRest == 0 && s.size == 1) {
+              c = c + 1
+            } else
+                c = countCoins(s.tail, curRest, c)
+          }
+        }
+        c
+      }
+  
+      def getCombinations(s: List[Int]): Int = { innerGetCombinations(List(), s, 0) }
+  
+      def innerGetCombinations(prefix: List[Int], s: List[Int], counter : Int): Int = {
+        var c = counter
+        if (s.size > 0) {
+          val curComb = prefix :+ s.head
+          c = countCoins(curComb, money, c)
+          c = innerGetCombinations(prefix :+ s.head, s.tail, c);
+          c = innerGetCombinations(prefix, s.tail, c);
+        }
+        c
+      }
+  
+      val s = coins.sorted.reverse
+      getCombinations(s)
     }
   }
