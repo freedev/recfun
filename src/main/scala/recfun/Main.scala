@@ -25,20 +25,20 @@ object Main {
    */
     def balance(chars: List[Char]): Boolean = {
       def loop(chars: List[Char], acc: Int): Int = {
+        var c = acc
         if (!chars.isEmpty) {
           val head = chars.head
           if (head == '(') {
-            loop(chars.tail, acc + 1)
+            c = loop(chars.tail, c + 1)
           } else if (head == ')') {
             if (acc > 0)
-              loop(chars.tail, acc - 1)
-            else
-              1
+              c = loop(chars.tail, c - 1)
+            else 
+              c = -1
           } else
-            loop(chars.tail, acc)
-        } else {
-          0
+            c = loop(chars.tail, c)
         }
+        c
       }
       loop(chars, 0) == 0
     }
