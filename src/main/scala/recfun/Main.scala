@@ -1,5 +1,7 @@
 package recfun
 
+import scala.annotation.tailrec
+
 object Main {
   def main(args: Array[String]) {
     println("Pascal's Triangle")
@@ -46,20 +48,24 @@ object Main {
    * Exercise 3
    */
     def countChange(money: Int, coins: List[Int]): Int = {
-        
-      def countCoins(s: List[Int], rest: Int, counter: Int): Int = {
-        if (!s.isEmpty) {
+      
+//      @tailrec
+      def countCoins(s: List[Int], coins: List[Int], rest: Int, counter: Int): Int = {
+        if (!s.isEmpty && rest > 0) {
           val curRest = rest - s.head
-          if (!(curRest < 0)) {
+          if (curRest >= 0) {
             if (curRest >= s.head) {
               if (s.size > 1) {
-                countCoins(s, curRest, countCoins(s.tail, curRest, counter) )
-              } else
-                countCoins(s, curRest, counter)
+                  countCoins(s, s.head :: coins, curRest, countCoins(s.tail, s.head :: coins, curRest, counter))
+              } else {
+                countCoins(s, s.head :: coins, curRest, counter)
+              }
             } else if (curRest == 0 && s.size == 1) {
+              println(s.head :: coins)
                counter + 1
-            } else
-               countCoins(s.tail, curRest, counter)
+            } else {
+               countCoins(s.tail, s.head :: coins, curRest, counter)
+            }
           } else
             counter
         } else
@@ -71,12 +77,19 @@ object Main {
       def innerGetCombinations(prefix: List[Int], s: List[Int], counter : Int): Int = {
         if (s.size > 0) {
           val curComb = prefix :+ s.head
-          innerGetCombinations(prefix, s.tail, innerGetCombinations(prefix :+ s.head, s.tail, countCoins(curComb, money, counter)));
-        } else
+          val (c1, c2) = (innerGetCombinations(curComb, s.tail, 0), innerGetCombinations(prefix, s.tail, 0))
+          val c = countCoins(curComb, List(), money, counter)
+          c + c1 + c2
+        } else {
+//          println(counter + " s.size == 0 " + prefix + " " + s )
           counter
+        }
       }
   
       val s = coins.sorted.reverse
-      getCombinations(s)
+      println("-- START ")
+      val ret = getCombinations(s)
+      println("-- STOP ")
+      ret
     }
   }
