@@ -72,21 +72,32 @@ object Main {
           counter
       }
   
-      def getCombinations(s: List[Int]): Int = { innerGetCombinations(List(), s, 0) }
+      def getCombinations(s: List[Int]): Int = { 
+        def iter(coins: List[List[Int]], counter: Int): Int = {
+          coins match {
+            case Nil => counter
+            case x :: xs => iter(xs, countCoins(x, List(), money, counter))
+          }
+        }
+        iter(innerGetCombinations(List(), s, 0, 0) , 0)
+      }
   
-      def innerGetCombinations(prefix: List[Int], s: List[Int], counter : Int): Int = {
+      def innerGetCombinations(prefix: List[Int], s: List[Int], counter : Int, depth: Int): List[List[Int]] = {
         if (s.size > 0) {
-          val curComb = prefix :+ s.head
-          val (c1, c2) = (innerGetCombinations(curComb, s.tail, 0), innerGetCombinations(prefix, s.tail, 0))
-          val c = countCoins(curComb, List(), money, counter)
-          c + c1 + c2
+          val curComb = s.head :: prefix
+          val (l1, l2) = (innerGetCombinations(curComb, s.tail, 0, depth + 1), innerGetCombinations(prefix, s.tail, 0, depth + 1))
+          (l1, l2) match {
+            case (Nil, Nil) => List(curComb) 
+            case (x1, Nil) => List(curComb) ::: x1
+            case (Nil, x2) => List(curComb) ::: x2
+            case (x1, x2) => List(curComb) ::: x1 ::: x2
+          }
         } else {
-//          println(counter + " s.size == 0 " + prefix + " " + s )
-          counter
+          Nil
         }
       }
   
-      val s = coins.sorted.reverse
+      val s = coins.sorted
       println("-- START ")
       val ret = getCombinations(s)
       println("-- STOP ")
